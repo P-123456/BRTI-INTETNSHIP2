@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 8px;
+        }
+
+        input {
+            padding: 8px;
+            margin-bottom: 16px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            border-bottom: 1px solid #ccc;
+            padding: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .transaction-details {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .transaction-date {
+            color: #888;
+            font-size: 0.8rem;
+        }
+
+        .income {
+            color: #28a745;
+        }
+
+        .expense {
+            color: #dc3545;
+        }
+
+        .total-section {
+            margin-top: 20px;
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+        }
+    </style>
+    <title>Money Tracker</title>
+</head>
+<body>
+    <header>
+        <h1>Money Tracker</h1>
+    </header>
+
+    <div class="container">
+        <form id="transactionForm">
+            <label for="description">Description:</label>
+            <input type="text" id="description" name="description" required>
+
+            <label for="amount">Amount:</label>
+            <input type="number" id="amount" name="amount" required>
+
+            <label for="type">Type:</label>
+            <select id="type" name="type" required>
+                <option value="income">Income</option>
+                <option value="expense">Expense</option>
+                <option value="rent">Rent</option>
+                <option value="food">Food</option>
+                <option value="bills">Bills</option>
+            </select>
+
+            <label for="date">Date:</label>
+            <input type="date" id="date" name="date" required>
+
+            <button type="button" onclick="addTransaction()">Add Transaction</button>
+        </form>
+
+        <h2>Transaction History</h2>
+        <ul id="transactionList"></ul>
+
+        <div class="total-section">
+            <h2>Total and Remaining Amount</h2>
+            <p>Total Income: $<span id="totalIncome">0.00</span></p>
+            <p>Total Expenses: $<span id="totalExpense">0.00</span></p>
+            <p>Remaining Amount: $<span id="remainingAmount">0.00</span></p>
+        </div>
+    </div>
+
+    <script>
+        function addTransaction() {
+            var description = document.getElementById("description").value;
+            var amount = parseFloat(document.getElementById("amount").value);
+            var type = document.getElementById("type").value;
+            var date = document.getElementById("date").value;
+
+            var transactionList = document.getElementById("transactionList");
+            var listItem = document.createElement("li");
+
+            if (type === "income") {
+                listItem.classList.add("income");
+            } else {
+                listItem.classList.add("expense");
+            }
+
+            listItem.innerHTML = `
+                <div class="transaction-details">
+                    <span>${description} - $${amount.toFixed(2)}</span>
+                    <span class="transaction-date">${date}</span>
+                </div>
+                <button onclick="removeTransaction(this)">Remove</button>
+            `;
+
+            transactionList.appendChild(listItem);
+
+            // Update total and remaining amounts
+            updateTotalAmounts();
+
+            document.getElementById("transactionForm").reset();
+        }
+
+        function removeTransaction(button) {
+            var listItem = button.parentNode;
+            listItem.parentNode.removeChild(listItem);
+
+            // Update total and remaining amounts
+            updateTotalAmounts();
+        }
+
+        function updateTotalAmounts() {
+            var totalIncome = 0;
+            var totalExpense = 0;
+
+            var transactionList = document.getElementById("transactionList");
+            var transactions = transactionList.getElementsByTagName("li");
+
+            for (var i = 0; i < transactions.length; i++) {
+                var amountElement = transactions[i].querySelector(".transaction-details span");
+                var amount = parseFloat(amountElement.innerText.match(/\$([\d.,]+)/)[1]);
+
+                if (transactions[i].classList.contains("income")) {
+                    totalIncome += amount;
+                } else {
+                    totalExpense += amount;
+                }
+            }
+
+            var remainingAmount = totalIncome - totalExpense;
+
+            document.getElementById("totalIncome").innerText = totalIncome.toFixed(2);
+            document.getElementById("totalExpense").innerText = totalExpense.toFixed(2);
+            document.getElementById("remainingAmount").innerText = remainingAmount.toFixed(2);
+        }
+    </script>
+</body>
+</html>
